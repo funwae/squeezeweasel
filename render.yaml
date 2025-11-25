@@ -1,0 +1,63 @@
+services:
+  # API Service
+  - type: web
+    name: squeezeweasel-api
+    rootDir: apps/api
+    env: node
+    buildCommand: cd ../.. && pnpm install && cd apps/api && pnpm prisma:generate && pnpm build
+    startCommand: cd ../.. && cd apps/api && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        sync: false  # Set in Render dashboard
+      - key: REDIS_URL
+        sync: false  # Set in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Auto-generate secure secret
+      - key: DEMO_MODE
+        value: "true"
+      - key: WEB_BASE_URL
+        sync: false  # Set to your Vercel URL after deployment
+      - key: API_BASE_URL
+        sync: false  # Set to this service's URL after deployment
+      - key: OPENAI_API_KEY
+        sync: false  # Optional
+      - key: GEMINI_API_KEY
+        sync: false  # Optional
+
+  # Worker Service (processes jobs from queue)
+  - type: worker
+    name: squeezeweasel-worker
+    rootDir: apps/worker
+    env: node
+    buildCommand: cd ../.. && pnpm install && cd apps/worker && pnpm build
+    startCommand: cd ../.. && cd apps/worker && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: squeezeweasel-api
+          property: DATABASE_URL
+      - key: REDIS_URL
+        fromService:
+          type: web
+          name: squeezeweasel-api
+          property: REDIS_URL
+      - key: DEMO_MODE
+        value: "true"
+      - key: OPENAI_API_KEY
+        fromService:
+          type: web
+          name: squeezeweasel-api
+          property: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
+        fromService:
+          type: web
+          name: squeezeweasel-api
+          property: GEMINI_API_KEY
+
