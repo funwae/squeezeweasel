@@ -268,57 +268,13 @@ cd squeezeweasel
 pnpm install
 ```
 
-### 2. Environment
+### 2. Environment & Database Setup
 
-Create `.env` from the example:
-
-```bash
-cp .env.example .env
-```
-
-Fill in:
-
-* `DATABASE_URL`
-* `REDIS_URL`
-* `OPENAI_API_KEY` and/or `GEMINI_API_KEY`
-* Any email/SMS credentials you want to test with.
-
-### 3. Database
-
-From the repo root:
-
-```bash
-pnpm db:generate
-pnpm db:migrate
-```
-
-(Under the hood: runs Prisma migrations in `apps/api` against your Postgres instance.)
-
-### 4. Run everything
-
-```bash
-pnpm dev
-```
-
-This will:
-
-* Start `apps/web` (Next.js) on `http://localhost:3000`
-* Start `apps/api` on `http://localhost:4000`
-* Start `apps/worker` consuming jobs from the queue (implementation TBD).
-
-### 5. First Run – Fake Flow
-
-Initial dev plan:
-
-1. Implement a **simple demo flow** in the worker:
-   * Trigger → LLM summarization → log output.
-
-2. Add a minimal UI in `apps/web` to:
-   * Create a simple agent
-   * Trigger a manual run
-   * View the run output.
-
-Once this is stable, move on to the **Short-Squeeze Radar** template and the **NL → flow** feature.
+See [QUICKSTART.md](./QUICKSTART.md) for detailed setup instructions, including:
+- Environment variable configuration
+- Database setup (PostgreSQL)
+- Demo mode setup (optional)
+- Running the development servers
 
 ---
 
