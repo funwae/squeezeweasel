@@ -39,25 +39,13 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromService:
-          type: web
-          name: squeezeweasel-api
-          property: DATABASE_URL
+        sync: false  # Set same value as API service
       - key: REDIS_URL
-        fromService:
-          type: web
-          name: squeezeweasel-api
-          property: REDIS_URL
+        sync: false  # Set same value as API service
       - key: DEMO_MODE
         value: "true"
       - key: OPENAI_API_KEY
-        fromService:
-          type: web
-          name: squeezeweasel-api
-          property: OPENAI_API_KEY
+        sync: false  # Optional - set same as API service if using
       - key: GEMINI_API_KEY
-        fromService:
-          type: web
-          name: squeezeweasel-api
-          property: GEMINI_API_KEY
+        sync: false  # Optional - set same as API service if using
 

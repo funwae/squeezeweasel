@@ -56,14 +56,16 @@ API_BASE_URL = https://squeezeweasel-api.onrender.com
 
 1. Click on **`squeezeweasel-worker`** service
 2. Go to **"Environment"** tab
-3. Add the same variables:
+3. Add the **exact same** variables as the API service:
 
 ```
-DATABASE_URL = [same as API service]
-REDIS_URL = [same as API service]
+DATABASE_URL = [paste same Supabase connection string]
+REDIS_URL = [paste same Upstash Redis URL]
 ```
 
-**Tip**: You can copy-paste from the API service to save time!
+**Important**: Both services MUST use the same `DATABASE_URL` and `REDIS_URL` values!
+
+**Tip**: After setting them in the API service, copy-paste the values to the worker service.
 
 ## Step 5: Initialize Database
 
