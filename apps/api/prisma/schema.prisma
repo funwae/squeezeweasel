@@ -1,0 +1,281 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  MICROSOFT
+}
+
+enum WorkspacePlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  BUILDER
+  OPERATOR
+  VIEWER
+}
+
+enum AgentVersionStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum RunStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum RunNodeStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  SKIPPED
+}
+
+enum TriggerType {
+  MANUAL
+  SCHEDULE
+  WEBHOOK
+  OTHER
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String?
+  passwordHash String? // nullable for OAuth users
+  authProvider AuthProvider  @default(EMAIL)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
+  createdAgents   Agent[] @relation("AgentCreator")
+  createdVersions AgentVersion[]
+  createdSecrets  Secret[]
+
+  @@index([email])
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  ownerId   String
+  plan      WorkspacePlan @default(FREE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner     User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members   WorkspaceMember[]
+  agents    Agent[]
+  flowGraphs FlowGraph[]
+  secrets   Secret[]
+  connectors ConnectorConfig[]
+  runs      Run[]
+  mcpServers WorkspaceMCPServer[]
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(VIEWER)
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model Agent {
+  id              String   @id @default(uuid())
+  workspaceId     String
+  name            String
+  slug            String
+  description     String?
+  createdById     String
+  activeVersionId String? @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy     User           @relation("AgentCreator", fields: [createdById], references: [id])
+  activeVersion AgentVersion?  @relation("ActiveVersion", fields: [activeVersionId], references: [id])
+  versions      AgentVersion[]
+  runs          Run[]
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+  @@index([createdById])
+}
+
+model AgentVersion {
+  id            String              @id @default(uuid())
+  agentId       String
+  versionNumber Int
+  specMarkdown  String?
+  specJson      Json?
+  flowGraphId   String
+  status        AgentVersionStatus  @default(DRAFT)
+  createdById   String
+  createdAt     DateTime            @default(now())
+
+  agent      Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  flowGraph  FlowGraph @relation(fields: [flowGraphId], references: [id])
+  createdBy  User      @relation(fields: [createdById], references: [id])
+  activeIn   Agent?    @relation("ActiveVersion")
+  runs       Run[]
+  templates  Template[]
+
+  @@unique([agentId, versionNumber])
+  @@index([agentId])
+  @@index([flowGraphId])
+}
+
+model FlowGraph {
+  id         String   @id @default(uuid())
+  workspaceId String
+  graphJson  Json // { nodes: [...], edges: [...] }
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  agentVersions AgentVersion[]
+
+  @@index([workspaceId])
+}
+
+model Run {
+  id             String      @id @default(uuid())
+  agentId        String
+  agentVersionId String
+  workspaceId    String
+  triggerType    TriggerType
+  triggerPayload Json?
+  status         RunStatus   @default(PENDING)
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  errorMessage   String?
+
+  agent        Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentVersion AgentVersion @relation(fields: [agentVersionId], references: [id])
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  nodes        RunNode[]
+
+  @@index([agentId])
+  @@index([workspaceId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model RunNode {
+  id          String         @id @default(uuid())
+  runId       String
+  nodeId      String // node ID from flow graph
+  nodeType    String
+  status      RunNodeStatus  @default(PENDING)
+  input       Json?
+  output      Json?
+  errorMessage String?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([nodeId])
+}
+
+model Secret {
+  id           String   @id @default(uuid())
+  workspaceId String
+  name         String
+  encryptedValue String // base64 encoded encrypted value
+  createdById  String
+  createdAt    DateTime @default(now())
+
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User           @relation(fields: [createdById], references: [id])
+  connectors ConnectorConfig[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+}
+
+model ConnectorConfig {
+  id           String   @id @default(uuid())
+  workspaceId  String
+  connectorType String // e.g., "gmail", "slack", "http", "fintel_api"
+  configJson   Json     // non-secret metadata
+  secretId     String?  // reference to secret if needed
+  createdAt    DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  secret    Secret?   @relation(fields: [secretId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([connectorType])
+}
+
+model Template {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  category      String?  // e.g., "trading", "sales", "marketing"
+  author        String?
+  agentVersionId String
+  public        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  agentVersion AgentVersion @relation(fields: [agentVersionId], references: [id])
+
+  @@index([category])
+  @@index([public])
+}
+
+model WorkspaceMCPServer {
+  id          String   @id @default(uuid())
+  workspaceId String
+  name        String
+  serverUrl   String?  // URL for HTTP-based MCP servers
+  transport   String   // "stdio", "sse", "http"
+  configJson  Json     // Connection metadata, auth, etc.
+  scopes      Json     // Allowed tools/resources (jsonb array)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([enabled])
+}
+

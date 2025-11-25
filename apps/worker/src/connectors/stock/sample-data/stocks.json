@@ -1,0 +1,99 @@
+{
+  "GME": {
+    "ticker": "GME",
+    "shortInterest": 25.5,
+    "float": 76.5,
+    "sharesOutstanding": 305.2,
+    "marketCap": 8500000000,
+    "borrowFee": 12.5,
+    "utilization": 88.2,
+    "price": 27.85,
+    "volume": 12500000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "AMC": {
+    "ticker": "AMC",
+    "shortInterest": 18.3,
+    "float": 513.8,
+    "sharesOutstanding": 513.8,
+    "marketCap": 2100000000,
+    "borrowFee": 8.7,
+    "utilization": 92.1,
+    "price": 4.09,
+    "volume": 45000000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "BBBY": {
+    "ticker": "BBBY",
+    "shortInterest": 32.1,
+    "float": 28.4,
+    "sharesOutstanding": 28.4,
+    "marketCap": 85000000,
+    "borrowFee": 15.2,
+    "utilization": 75.8,
+    "price": 2.99,
+    "volume": 3200000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "SPRT": {
+    "ticker": "SPRT",
+    "shortInterest": 28.7,
+    "float": 12.1,
+    "sharesOutstanding": 12.1,
+    "marketCap": 180000000,
+    "borrowFee": 18.5,
+    "utilization": 85.3,
+    "price": 14.87,
+    "volume": 8900000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "CLOV": {
+    "ticker": "CLOV",
+    "shortInterest": 22.4,
+    "float": 405.2,
+    "sharesOutstanding": 405.2,
+    "marketCap": 1200000000,
+    "borrowFee": 6.3,
+    "utilization": 68.9,
+    "price": 2.96,
+    "volume": 18000000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "WISH": {
+    "ticker": "WISH",
+    "shortInterest": 19.8,
+    "float": 610.5,
+    "sharesOutstanding": 610.5,
+    "marketCap": 450000000,
+    "borrowFee": 9.1,
+    "utilization": 72.4,
+    "price": 0.74,
+    "volume": 12000000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "SNDL": {
+    "ticker": "SNDL",
+    "shortInterest": 15.6,
+    "float": 2100.3,
+    "sharesOutstanding": 2100.3,
+    "marketCap": 350000000,
+    "borrowFee": 4.2,
+    "utilization": 55.7,
+    "price": 0.17,
+    "volume": 25000000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  },
+  "NAKD": {
+    "ticker": "NAKD",
+    "shortInterest": 24.3,
+    "float": 8.9,
+    "sharesOutstanding": 8.9,
+    "marketCap": 12000000,
+    "borrowFee": 11.8,
+    "utilization": 78.6,
+    "price": 1.35,
+    "volume": 1500000,
+    "lastUpdated": "2024-11-15T09:00:00Z"
+  }
+}
+
