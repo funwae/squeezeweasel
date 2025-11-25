@@ -245,15 +245,16 @@ These are the reference documents for any future development (human or AI-driven
 
 ## Quick Deploy
 
-### One-Click Deployments
+### One-Click Deploy to Render
 
-**Frontend (Vercel):**
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/funwae/squeezeweasel&root-directory=apps/web)
-
-**Backend (Render):**
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/docs/deploy-button)
 
-See [DEPLOYMENT_QUICKSTART.md](./DEPLOYMENT_QUICKSTART.md) for quick reference, or [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) and [RENDER_DEPLOY.md](./RENDER_DEPLOY.md) for detailed guides.
+**Or manually:**
+1. Go to [render.com](https://render.com) → New → Blueprint
+2. Connect repo: `funwae/squeezeweasel`
+3. Render auto-detects `render.yaml` and creates all 3 services (Web, API, Worker)
+
+See [DEPLOYMENT_QUICKSTART.md](./DEPLOYMENT_QUICKSTART.md) for quick reference, or [RENDER_SIMPLE.md](./RENDER_SIMPLE.md) for detailed step-by-step guide.
 
 ## Getting Started (Dev)
 

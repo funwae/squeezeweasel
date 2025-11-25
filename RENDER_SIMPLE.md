@@ -2,11 +2,12 @@
 
 ## What You're Deploying
 
-Render will create **2 services** automatically:
-1. **API** - Handles HTTP requests
-2. **Worker** - Processes background jobs
+Render will create **3 services** automatically:
+1. **Web** - Next.js frontend (your UI)
+2. **API** - Fastify backend (handles HTTP requests)
+3. **Worker** - Background worker (processes jobs from queue)
 
-Both use the same database and Redis.
+All services share the same database and Redis.
 
 ## Step 1: Deploy to Render
 
@@ -36,21 +37,25 @@ Render will detect `render.yaml` and create both services automatically! ✅
 
 ## Step 4: Configure Render Environment Variables
 
-### In the `squeezeweasel-api` service:
+### In the `squeezeweasel-web` service:
 
 1. Go to your Render dashboard
-2. Click on **`squeezeweasel-api`** service
+2. Click on **`squeezeweasel-web`** service
 3. Go to **"Environment"** tab
-4. Add these variables:
+4. Wait - we'll set `NEXT_PUBLIC_API_BASE_URL` after the API service is deployed
+
+### In the `squeezeweasel-api` service:
+
+1. Click on **`squeezeweasel-api`** service
+2. Go to **"Environment"** tab
+3. Add these variables:
 
 ```
 DATABASE_URL = [paste your Supabase connection string]
 REDIS_URL = [paste your Upstash Redis URL]
-WEB_BASE_URL = https://your-vercel-app.vercel.app
-API_BASE_URL = https://squeezeweasel-api.onrender.com
+WEB_BASE_URL = [we'll set this after web service deploys]
+API_BASE_URL = [we'll set this after API service deploys]
 ```
-
-**Note**: Replace `your-vercel-app` with your actual Vercel URL after deploying frontend.
 
 ### In the `squeezeweasel-worker` service:
 
@@ -84,26 +89,35 @@ pnpm --filter api seed-demo
 
 Wait for each command to finish before running the next one.
 
-## Step 6: Get Your API URL
+## Step 6: Connect Services Together
 
-1. Go to **`squeezeweasel-api`** service dashboard
-2. Copy the service URL (shown at the top)
-   - Example: `https://squeezeweasel-api.onrender.com`
-3. Update the `API_BASE_URL` environment variable with this exact URL
+After all services are deployed, you need to link them:
 
-## Step 7: Deploy Frontend to Vercel
+### Get Service URLs:
 
-See `VERCEL_DEPLOYMENT.md` for Vercel setup, then:
+1. **Web service URL**: Go to `squeezeweasel-web` → Copy the URL (e.g., `https://squeezeweasel-web.onrender.com`)
+2. **API service URL**: Go to `squeezeweasel-api` → Copy the URL (e.g., `https://squeezeweasel-api.onrender.com`)
 
-1. Set `NEXT_PUBLIC_API_BASE_URL` to your Render API URL
-2. Set `NEXT_PUBLIC_DEMO_MODE=true`
+### Update Environment Variables:
+
+**In `squeezeweasel-web` service:**
+- Set `NEXT_PUBLIC_API_BASE_URL` = `[your API service URL]`
+
+**In `squeezeweasel-api` service:**
+- Set `WEB_BASE_URL` = `[your Web service URL]`
+- Set `API_BASE_URL` = `[your API service URL]` (same as above)
+
+**In `squeezeweasel-worker` service:**
+- No changes needed (already configured)
 
 ## That's It! 🎉
 
 Your demo should now be working:
-- Frontend: Your Vercel URL
-- Backend: Your Render API URL
-- Worker: Running automatically in background
+- **Frontend**: Your Render Web service URL (e.g., `https://squeezeweasel-web.onrender.com`)
+- **Backend**: Your Render API service URL
+- **Worker**: Running automatically in background
+
+Visit your Web service URL to see the demo!
 
 ## Troubleshooting
 

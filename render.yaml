@@ -1,4 +1,21 @@
 services:
+  # Frontend (Next.js)
+  - type: web
+    name: squeezeweasel-web
+    rootDir: apps/web
+    env: node
+    buildCommand: cd ../.. && pnpm install && cd apps/web && pnpm build
+    startCommand: cd ../.. && cd apps/web && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_DEMO_MODE
+        value: "true"
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false  # Set to API service URL after deploy
+
   # API Service
   - type: web
     name: squeezeweasel-api
@@ -20,9 +37,9 @@ services:
       - key: DEMO_MODE
         value: "true"
       - key: WEB_BASE_URL
-        sync: false  # Set to your Vercel URL after deployment
+        sync: false  # Set to web service URL after deploy
       - key: API_BASE_URL
-        sync: false  # Set to this service's URL after deployment
+        sync: false  # Set to this service's URL after deploy
       - key: OPENAI_API_KEY
         sync: false  # Optional
       - key: GEMINI_API_KEY
